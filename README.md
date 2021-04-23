@@ -2,7 +2,7 @@
 ```bash
 export CIRCLE_TOKEN=<CircleCI Token> # get on Bitwarden
 yarn
-node src/index.js
+yarn start
 ```
 
 # Result
