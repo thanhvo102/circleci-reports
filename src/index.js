@@ -59,6 +59,7 @@ const getPipelineIds = async (branch, count) => {
 const getPipelineStatus = async (pipelineId) => {
   const { items } = await getPipelineWorkflows(pipelineId);
 
+  // Get status of the first workflow (at the end of the array)
   return items[items.length - 1].status;
 };
 
