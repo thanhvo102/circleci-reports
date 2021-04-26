@@ -79,13 +79,12 @@ const getPipelinesStatusSummary = async (pipelineIds) => {
     pipelineStatuses = [...pipelineStatuses, ...batchStatuses];
   }
 
-  const summary = {
-    failed: 0,
-    running: 0,
-    success: 0,
-  };
+  const summary = {};
 
   pipelineStatuses.reduce((accumulator, status) => {
+    if (accumulator[status] === undefined) {
+      accumulator[status] = 0;
+    }
     accumulator[status] += 1;
 
     return accumulator;
