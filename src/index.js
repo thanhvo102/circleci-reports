@@ -48,7 +48,12 @@ const getPipelineIds = async (branch, count) => {
 
     pageToken = nextPageToken;
     const nextPipelineIds = items.filter(item => item.vcs.branch === branch)
-      .map(item => item.id);
+      .map(item => {
+        // DEBUG
+        // console.log(item.id);
+        // console.log(item.vcs.commit.subject);
+        return item.id;
+      });
 
     pipelineIds = [...pipelineIds, ...nextPipelineIds];
 
@@ -81,9 +86,19 @@ const getPipelinesStatusSummary = async (pipelineIds, count) => {
     pipelineStatuses = [...pipelineStatuses, ...batchStatuses];
   }
 
+  // DEBUG
+  // console.log(pipelineIds);
+  // console.log(pipelineStatuses);
+  // console.log(pipelineStatuses.length);
+
   pipelineStatuses = pipelineStatuses
     .filter(status => status !== "canceled")
     .slice(0, count);
+
+  // DEBUG
+  // console.log(pipelineStatuses);
+  // console.log(pipelineStatuses.length);
+
   const summary = {};
 
   pipelineStatuses.reduce((accumulator, status) => {
