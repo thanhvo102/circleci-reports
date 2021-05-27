@@ -38,7 +38,9 @@ const getPipelineIds = async (branch, count) => {
   let pipelineIds = [];
   let pageToken;
 
-  while (pipelineIds.length < count) {
+  const backupCount = count + 20; // in case there are cancelled pipelines
+
+  while (pipelineIds.length < backupCount) {
     const {
       items,
       next_page_token: nextPageToken,
@@ -50,8 +52,8 @@ const getPipelineIds = async (branch, count) => {
 
     pipelineIds = [...pipelineIds, ...nextPipelineIds];
 
-    if (pipelineIds.length >= count || !nextPageToken) {
-      return pipelineIds.slice(0, count);
+    if (pipelineIds.length >= backupCount || !nextPageToken) {
+      return pipelineIds.slice(0, backupCount);
     }
   }
 };
@@ -65,7 +67,7 @@ const getPipelineStatus = async (pipelineId) => {
 
 
 
-const getPipelinesStatusSummary = async (pipelineIds) => {
+const getPipelinesStatusSummary = async (pipelineIds, count) => {
   const BATCH_SIZE = 25;
   let pipelineStatuses = [];
 
@@ -79,6 +81,9 @@ const getPipelinesStatusSummary = async (pipelineIds) => {
     pipelineStatuses = [...pipelineStatuses, ...batchStatuses];
   }
 
+  pipelineStatuses = pipelineStatuses
+    .filter(status => status !== "canceled")
+    .slice(0, count);
   const summary = {};
 
   pipelineStatuses.reduce((accumulator, status) => {
@@ -93,8 +98,10 @@ const getPipelinesStatusSummary = async (pipelineIds) => {
   return summary;
 };
 
-getPipelineIds("master", 100).then((ids) => {
-  getPipelinesStatusSummary(ids).then((count) => {
+const PIPELINES_COUNT = 100;
+
+getPipelineIds("master", PIPELINES_COUNT).then((ids) => {
+  getPipelinesStatusSummary(ids, PIPELINES_COUNT).then((count) => {
     console.log(count);
   });
 });
